@@ -34,13 +34,11 @@ class IoTDevice:
         self.light_intensity = 0  # 0: выкл, 1: низкий, 2: средний, 3: высокий
         self.mode = 'manual'
 
-        # Пороговые значения
-        self.interval = 1
-
         # Интерфейс
         self.create_interface()
 
         # Таймер для обновления данных
+        self.interval = 10
         self.running = True
         self.sensor_update_thread = threading.Thread(target=self.update_sensor_values)
         self.sensor_update_thread.start()
