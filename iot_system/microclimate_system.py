@@ -78,8 +78,6 @@ class MicroclimateSystem:
             if self.mode == 'auto':
                 self.automatic_control()
 
-            print(self.cooler_status, self.heater_status, self.mode)
-
             sensor_data = {
                 "temperature": round(self.temperature, 2),
                 "light_level": round(self.light_level, 2),

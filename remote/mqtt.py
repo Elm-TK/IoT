@@ -23,27 +23,9 @@ class MQTTClient:
     def on_connect(self, client, userdata, flags, rc):
         print("Подключено к MQTT-серверу с кодом:", rc)
 
-        self.client.subscribe("current/temperature")
-        self.client.subscribe("current/light_level")
-        self.client.subscribe("current/soil_moisture")
-        self.client.subscribe("current/water_level")
-
-        self.client.subscribe("system/pump_status")
-        self.client.subscribe("system/cooler_status")
-        self.client.subscribe("system/heater_status")
-        self.client.subscribe("system/light_intensity")
-        self.client.subscribe("system/mode")
-
-        self.client.subscribe("threshold/temp_max")
-        self.client.subscribe("threshold/temp_min")
-        self.client.subscribe("threshold/light_max")
-        self.client.subscribe("threshold/light_min")
-        self.client.subscribe("threshold/soil_max")
-        self.client.subscribe("threshold/soil_min")
-        self.client.subscribe("threshold/water_max")
-        self.client.subscribe("threshold/water_min")
-
-
+        self.client.subscribe("current/#")
+        self.client.subscribe("system/#")
+        self.client.subscribe("threshold/#")
 
     def on_message(self, client, userdata, msg):
         # Обработка полученного сообщения
@@ -51,27 +33,22 @@ class MQTTClient:
         print("remote Получено сообщение:", msg.topic, command)
         if msg.topic == "current/temperature":
             self.microclimate_system.temperature = command["temperature"]
-            print(self.microclimate_system.temperature)
         elif msg.topic == "current/light_level":
             self.microclimate_system.light_level = command["light_level"]
         elif msg.topic == "current/soil_moisture":
             self.microclimate_system.soil_moisture = command["soil_moisture"]
         elif msg.topic == "current/water_level":
             self.microclimate_system.water_level = command["water_level"]
-
         elif msg.topic == "system/pump_status":
             self.microclimate_system.pump_status = command["pump_status"]
         elif msg.topic == "system/cooler_status":
             self.microclimate_system.cooler_status = command["cooler_status"]
-            self.interface.update_cooler_status()
         elif msg.topic == "system/heater_status":
             self.microclimate_system.heater_status = command["heater_status"]
-            self.interface.update_heater_status()
         elif msg.topic == "system/light_intensity":
             self.microclimate_system.light_intensity = command["light_intensity"]
         elif msg.topic == "system/mode":
             self.microclimate_system.mode = command["mode"]
-
         elif msg.topic == "threshold/temp_max":
             self.microclimate_system.temp_max = command["temp_max"]
         elif msg.topic == "threshold/temp_min":
@@ -88,7 +65,6 @@ class MQTTClient:
             self.microclimate_system.water_max = command["water_max"]
         elif msg.topic == "threshold/water_min":
             self.microclimate_system.water_min = command["water_min"]
-
 
     def publish_data(self, payload):
         # Публикуем данные с датчиков
