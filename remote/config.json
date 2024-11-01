@@ -1,0 +1,6 @@
+{
+    "mqtt_server": "test.mosquitto.org",
+    "mqtt_port": 1883,
+    "topic_data": "iot/simulator/data",
+    "topic_control": "iot/simulator/control"
+}
