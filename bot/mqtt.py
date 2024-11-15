@@ -1,4 +1,6 @@
+import asyncio
 import json
+
 import paho.mqtt.client as mqtt
 
 
@@ -39,6 +41,15 @@ class MQTTClient:
             self.microclimate_system.soil_moisture = command["soil_moisture"]
         elif msg.topic == "current/water_level":
             self.microclimate_system.water_level = command["water_level"]
+            print("Проверка")
+            if self.microclimate_system.water_level < self.microclimate_system.water_min:
+                # Вызов асинхронного метода send_water_alert
+                if self.interface:
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    task = loop.create_task(self.interface.send_water_alert())
+                    loop.run_until_complete(task)  # Ждём завершения задачи перед продолжением
+
         elif msg.topic == "system/pump_status":
             self.microclimate_system.pump_status = command["pump_status"]
         elif msg.topic == "system/cooler_status":

@@ -87,7 +87,7 @@ class MicroclimateSystem:
 
             # Публикуем данные по разным топикам для каждого сенсора
             for sensor, value in sensor_data.items():
-                self.mqtt_client.publish_topic_data(f"current/{sensor}", value)
+                self.mqtt_client.publish_topic_data(f"current/{sensor}", json.dumps({sensor: value}))
 
             systems_status = {
                 "pump_status": self.pump_status,
@@ -97,7 +97,7 @@ class MicroclimateSystem:
                 "mode": self.mode,
             }
             for system, status in systems_status.items():
-                self.mqtt_client.publish_topic_data(f"system/{system}", status)
+                self.mqtt_client.publish_topic_data(f"system/{system}", json.dumps({system: status}))
 
             threshold_values = {
                 "temp_max": self.temp_max,
@@ -111,7 +111,7 @@ class MicroclimateSystem:
             }
 
             for threshold, value in threshold_values.items():
-                self.mqtt_client.publish_topic_data(f"threshold/{threshold}", value)
+                self.mqtt_client.publish_topic_data(f"threshold/{threshold}", json.dumps({threshold: value}))
 
     def automatic_control(self):
         temp_mid = (self.temp_min + self.temp_max) / 2
