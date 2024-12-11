@@ -16,8 +16,8 @@ class MQTTClient:
         self.topic_control = config["topic_control"]
         self.client_id = config["client_id"]
         # Инициализируем MQTT-клиента
-        # self.client = mqtt.Client(client_id=self.client_id)
-        self.client = mqtt.Client()
+        self.client = mqtt.Client(client_id=self.client_id)
+        # self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         self.client.connect(self.server, self.port)
@@ -28,6 +28,7 @@ class MQTTClient:
 
     def on_message(self, client, userdata, msg):
         # Обработка полученного сообщения
+        print("*****",msg.payload)
         try:
             # Попробуйте декодировать только если сообщение не пустое
             if msg.payload:

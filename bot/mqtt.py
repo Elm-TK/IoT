@@ -1,4 +1,6 @@
+import asyncio
 import json
+
 import paho.mqtt.client as mqtt
 
 
@@ -28,43 +30,55 @@ class MQTTClient:
         self.client.subscribe("threshold/#")
 
     def on_message(self, client, userdata, msg):
-        # Обработка полученного сообщения
-        command = json.loads(msg.payload.decode())
-        print("remote Получено сообщение:", msg.topic, command)
-        if msg.topic == "current/temperature":
-            self.microclimate_system.temperature = command["temperature"]
-        elif msg.topic == "current/light_level":
-            self.microclimate_system.light_level = command["light_level"]
-        elif msg.topic == "current/soil_moisture":
-            self.microclimate_system.soil_moisture = command["soil_moisture"]
-        elif msg.topic == "current/water_level":
-            self.microclimate_system.water_level = command["water_level"]
-        elif msg.topic == "system/pump_status":
-            self.microclimate_system.pump_status = command["pump_status"]
-        elif msg.topic == "system/cooler_status":
-            self.microclimate_system.cooler_status = command["cooler_status"]
-        elif msg.topic == "system/heater_status":
-            self.microclimate_system.heater_status = command["heater_status"]
-        elif msg.topic == "system/light_intensity":
-            self.microclimate_system.light_intensity = command["light_intensity"]
-        elif msg.topic == "system/mode":
-            self.microclimate_system.mode = command["mode"]
-        elif msg.topic == "threshold/temp_max":
-            self.microclimate_system.temp_max = command["temp_max"]
-        elif msg.topic == "threshold/temp_min":
-            self.microclimate_system.temp_min = command["temp_min"]
-        elif msg.topic == "threshold/light_max":
-            self.microclimate_system.light_max = command["light_max"]
-        elif msg.topic == "threshold/light_min":
-            self.microclimate_system.light_min = command["light_min"]
-        elif msg.topic == "threshold/soil_max":
-            self.microclimate_system.soil_max = command["soil_max"]
-        elif msg.topic == "threshold/soil_min":
-            self.microclimate_system.soil_min = command["soil_min"]
-        elif msg.topic == "threshold/water_max":
-            self.microclimate_system.water_max = command["water_max"]
-        elif msg.topic == "threshold/water_min":
-            self.microclimate_system.water_min = command["water_min"]
+        try:
+            # Обработка полученного сообщения
+            command = json.loads(msg.payload.decode())
+            print("remote Получено сообщение:", msg.topic, command)
+            if msg.topic == "current/temperature":
+                self.microclimate_system.temperature = command
+            elif msg.topic == "current/light_level":
+                self.microclimate_system.light_level = command
+            elif msg.topic == "current/soil_moisture":
+                self.microclimate_system.soil_moisture = command
+            elif msg.topic == "current/water_level":
+                self.microclimate_system.water_level = command
+                print("Проверка")
+                if self.microclimate_system.water_level < self.microclimate_system.water_min:
+                    # Вызов асинхронного метода send_water_alert
+                    if self.interface:
+                        loop = asyncio.new_event_loop()
+                        asyncio.set_event_loop(loop)
+                        task = loop.create_task(self.interface.send_water_alert())
+                        loop.run_until_complete(task)  # Ждём завершения задачи перед продолжением
+
+            elif msg.topic == "system/pump_status":
+                self.microclimate_system.pump_status = command
+            elif msg.topic == "system/cooler_status":
+                self.microclimate_system.cooler_status = command
+            elif msg.topic == "system/heater_status":
+                self.microclimate_system.heater_status = command
+            elif msg.topic == "system/light_intensity":
+                self.microclimate_system.light_intensity = command
+            elif msg.topic == "system/mode":
+                self.microclimate_system.mode = command
+            elif msg.topic == "threshold/temp_max":
+                self.microclimate_system.temp_max = command
+            elif msg.topic == "threshold/temp_min":
+                self.microclimate_system.temp_min = command
+            elif msg.topic == "threshold/light_max":
+                self.microclimate_system.light_max = command
+            elif msg.topic == "threshold/light_min":
+                self.microclimate_system.light_min = command
+            elif msg.topic == "threshold/soil_max":
+                self.microclimate_system.soil_max = command
+            elif msg.topic == "threshold/soil_min":
+                self.microclimate_system.soil_min = command
+            elif msg.topic == "threshold/water_max":
+                self.microclimate_system.water_max = command
+            elif msg.topic == "threshold/water_min":
+                self.microclimate_system.water_min = command
+        except json.JSONDecodeError as e:
+            print(f"Ошибка декодирования JSON: {e}")
 
     def publish_data(self, payload):
         # Публикуем данные с датчиков

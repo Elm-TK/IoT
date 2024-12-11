@@ -97,21 +97,21 @@ class MicroclimateSystem:
                 "mode": self.mode,
             }
             for system, status in systems_status.items():
-                self.mqtt_client.publish_topic_data(f"system/{system}", status)
+                self.mqtt_client.publish_topic_data(f"system/{system}", json.dumps(status))
 
-            threshold_values = {
-                "temp_max": self.temp_max,
-                "temp_min": self.temp_min,
-                "light_max": self.light_max,
-                "light_min": self.light_min,
-                "soil_max": self.soil_max,
-                "soil_min": self.soil_min,
-                "water_max": self.water_max,
-                "water_min": self.water_min,
-            }
+                threshold_values = {
+                    "temp_max": self.temp_max,
+                    "temp_min": self.temp_min,
+                    "light_max": self.light_max,
+                    "light_min": self.light_min,
+                    "soil_max": self.soil_max,
+                    "soil_min": self.soil_min,
+                    "water_max": self.water_max,
+                    "water_min": self.water_min,
+                }
 
-            for threshold, value in threshold_values.items():
-                self.mqtt_client.publish_topic_data(f"threshold/{threshold}", value)
+                for threshold, value in threshold_values.items():
+                    self.mqtt_client.publish_topic_data(f"threshold/{threshold}", value)
 
     def automatic_control(self):
         temp_mid = (self.temp_min + self.temp_max) / 2
