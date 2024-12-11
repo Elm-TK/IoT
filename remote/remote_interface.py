@@ -151,7 +151,7 @@ class RemoteInterface:
     def toggle_mode(self):
         # Переключаем режим между "Автоматический" и "Ручной"
         self.microclimate_system.mode = 'manual' if self.microclimate_system.mode == 'auto' else 'auto'
-        self.mqtt_client.publish_topic_data("remote/mode", json.dumps({"mode": self.microclimate_system.mode}))
+        self.mqtt_client.publish_topic_data("remote/mode", self.microclimate_system.mode)
         print(self.microclimate_system.mode)
         # Обновляем текст кнопки в зависимости от режима
         self.mode_button.config(text="Автоматический" if self.microclimate_system.mode == 'auto' else "Ручной")
@@ -160,36 +160,31 @@ class RemoteInterface:
         if self.microclimate_system.mode == 'manual':
             self.microclimate_system.cooler_status = not self.microclimate_system.cooler_status
             self.update_cooler_status()
-            self.mqtt_client.publish_topic_data(f"remote/cooler",
-                                                json.dumps({"cooler": self.microclimate_system.cooler_status}))
+            self.mqtt_client.publish_topic_data(f"remote/cooler", json.dumps(self.microclimate_system.cooler_status))
 
     def toggle_heater(self):
         if self.microclimate_system.mode == 'manual':
             self.microclimate_system.heater_status = not self.microclimate_system.heater_status
             self.update_heater_status()
-            self.mqtt_client.publish_topic_data(f"remote/heater",
-                                                json.dumps({"heater": self.microclimate_system.heater_status}))
+            self.mqtt_client.publish_topic_data(f"remote/heater", json.dumps(self.microclimate_system.heater_status))
 
     def toggle_light_intensity(self):
         if self.microclimate_system.mode == 'manual':
             self.microclimate_system.light_intensity = (self.microclimate_system.light_intensity + 1) % 4
             self.update_light_status()
-            self.mqtt_client.publish_topic_data(f"remote/light_intensity",
-                                                str(self.microclimate_system.light_intensity))
+            self.mqtt_client.publish_topic_data(f"remote/light_intensity", self.microclimate_system.light_intensity)
 
     def toggle_pump(self):
         if self.microclimate_system.mode == 'manual':
             self.microclimate_system.pump_status = not self.microclimate_system.pump_status
             self.update_pump_status()
-            self.mqtt_client.publish_topic_data(f"remote/pump",
-                                                json.dumps({"pump": self.microclimate_system.pump_status}))
+            self.mqtt_client.publish_topic_data(f"remote/pump", json.dumps(self.microclimate_system.pump_status))
 
     def add_water(self):
         self.microclimate_system.water_level = 100.0
         self.water_label.config(text=f"Уровень воды: {self.microclimate_system.water_level:.2f}%")
         messagebox.showinfo("Добавление воды", "Вода добавлена в резервуар")
-        self.mqtt_client.publish_topic_data(f"remote/water",
-                                            json.dumps({"water": self.microclimate_system.water_level}))
+        self.mqtt_client.publish_topic_data(f"remote/water", json.dumps(self.microclimate_system.water_level))
 
     def update_cooler_status(self):
         self.cooler_button.config(
@@ -254,7 +249,8 @@ class RemoteInterface:
             "soil_min": self.soil_min_entry.get(),
             "water_min": self.water_min_entry.get(),
         }
-        self.mqtt_client.publish_topic_data("remote/entries", json.dumps(entries_data))
+        for entry, value in entries_data.items():
+            self.mqtt_client.publish_topic_data(f"remote/entries/{entry}", value)
 
 
 # Запуск приложения
