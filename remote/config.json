@@ -1,6 +1,7 @@
 {
-    "mqtt_server": "broker.hivemq.com",
+    "mqtt_server": "dev.rightech.io",
     "mqtt_port": 1883,
     "topic_data": "iot/simulator/data",
-    "topic_control": "iot/simulator/control"
+    "topic_control": "iot/simulator/control",
+    "client_id": "mqtt-temirlan200370-x1e1by"
 }

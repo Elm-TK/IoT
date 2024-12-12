@@ -11,20 +11,20 @@ class MicroclimateSystem:
     def __init__(self, is_remote=False):
 
         # Инициализационные переменные (Максимальные, минимальные, начальные значения)
-        self.temp_min = 15.0
+        self.temp_min = 20.0
         self.temp_max = 30.0
         self.light_min = 40.0
         self.light_max = 80.0
-        self.soil_min = 40.0
-        self.soil_max = 70.0
+        self.soil_min = 10.0
+        self.soil_max = 20.0
         self.water_min = 20.0
         self.water_max = 100.0
 
         # Инициализация значений датчиков и актуаторов
-        self.temperature = 20.00
+        self.temperature = 35.00
         self.light_level = 70.00
-        self.soil_moisture = 50.00
-        self.water_level = 100.00
+        self.soil_moisture = 11.00
+        self.water_level = 21.00
         self.pump_status = False
         self.cooler_status = False
         self.heater_status = False
@@ -37,7 +37,7 @@ class MicroclimateSystem:
             self.mqtt_client = MQTTClient(self)
             self.mqtt_client.start()
             # Таймер для обновления данных
-            self.interval = 5
+            self.interval = 10
             self.running = True
             self.sensor_update_thread = threading.Thread(target=self.update_sensor_values)
             self.sensor_update_thread.start()
