@@ -5,6 +5,7 @@ import time
 from tkinter import *
 
 from mqtt import MQTTClient
+# from firebase import firebase_admin, db  # Импорт Firebase
 
 
 class MicroclimateSystem:
@@ -41,6 +42,20 @@ class MicroclimateSystem:
             self.running = True
             self.sensor_update_thread = threading.Thread(target=self.update_sensor_values)
             self.sensor_update_thread.start()
+            # Инициализация Firebase
+            self.initialize_firebase()
+
+    def initialize_firebase(self):
+        # Импортируем firebase_admin только здесь
+        import firebase_admin
+        from firebase_admin import credentials, db
+
+        # Инициализация Firebase
+        cred = credentials.Certificate("microclimate-cde2b-firebase-adminsdk-sd70l-f1a817eff7.json")
+        firebase_admin.initialize_app(cred, {
+            "databaseURL": "https://microclimate-cde2b-default-rtdb.europe-west1.firebasedatabase.app/"
+        })
+        self.firebase_db = db
 
     def update_sensor_values(self):
         while self.running:
@@ -99,19 +114,29 @@ class MicroclimateSystem:
             for system, status in systems_status.items():
                 self.mqtt_client.publish_topic_data(f"system/{system}", json.dumps(status))
 
-                threshold_values = {
-                    "temp_max": self.temp_max,
-                    "temp_min": self.temp_min,
-                    "light_max": self.light_max,
-                    "light_min": self.light_min,
-                    "soil_max": self.soil_max,
-                    "soil_min": self.soil_min,
-                    "water_max": self.water_max,
-                    "water_min": self.water_min,
-                }
+            threshold_values = {
+                "temp_max": self.temp_max,
+                "temp_min": self.temp_min,
+                "light_max": self.light_max,
+                "light_min": self.light_min,
+                "soil_max": self.soil_max,
+                "soil_min": self.soil_min,
+                "water_max": self.water_max,
+                "water_min": self.water_min,
+            }
 
-                for threshold, value in threshold_values.items():
-                    self.mqtt_client.publish_topic_data(f"threshold/{threshold}", value)
+            for threshold, value in threshold_values.items():
+                self.mqtt_client.publish_topic_data(f"threshold/{threshold}", value)
+
+            # Публикация данных в Firebase
+            if hasattr(self, 'firebase_db'):
+                ref = self.firebase_db.reference("microclimate/device")
+                full_data = {
+                    "sensor_data": sensor_data,
+                    "systems_status": systems_status,
+                    "threshold_values": threshold_values
+                }
+                ref.set(full_data)
 
     def automatic_control(self):
         temp_mid = (self.temp_min + self.temp_max) / 2

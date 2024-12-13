@@ -151,7 +151,7 @@ class RemoteInterface:
     def toggle_mode(self):
         # Переключаем режим между "Автоматический" и "Ручной"
         self.microclimate_system.mode = 'manual' if self.microclimate_system.mode == 'auto' else 'auto'
-        self.mqtt_client.publish_topic_data("remote/mode", self.microclimate_system.mode)
+        self.mqtt_client.publish_topic_data("remote/mode", json.dumps(self.microclimate_system.mode))
         print(self.microclimate_system.mode)
         # Обновляем текст кнопки в зависимости от режима
         self.mode_button.config(text="Автоматический" if self.microclimate_system.mode == 'auto' else "Ручной")

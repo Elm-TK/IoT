@@ -14,10 +14,10 @@ class MQTTClient:
         self.port = config["mqtt_port"]
         self.topic_data = config["topic_data"]
         self.topic_control = config["topic_control"]
-        self.client_id = config["client_id"]
+        # self.client_id = config["client_id"]
         # Инициализируем MQTT-клиента
-        self.client = mqtt.Client(client_id=self.client_id)
-        # self.client = mqtt.Client()
+        # self.client = mqtt.Client(client_id=self.client_id)
+        self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         self.client.connect(self.server, self.port)
